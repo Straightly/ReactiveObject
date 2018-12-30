@@ -7,21 +7,23 @@ export default class SquareView extends React.Component {
     super(props);
     this.state = {
         value: props.value,
-        onClick:props.onClick,
+        onClick: props.onClick,
+        play:props.play,
     };
   }
 
   handleClick() {
-    alert('What is going on?')
-    if (this.state.value === 'X') {
-      this.state.onClick();
-    } else {
+    alert('State is ' + this.state.value + "play is " + this.state.play);
+    if (!this.state.value) {
       let newState = {
-        value: 'Y',
+        value: this.state.play,
         onClick: this.state.onClick,
-      }
+        play: this.state.play,
+      } 
+
       this.setState(newState);
     }
+    this.state.onClick();
   }
 
   render() {

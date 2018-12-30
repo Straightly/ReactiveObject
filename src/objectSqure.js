@@ -3,15 +3,21 @@ import './index.css';
 import SquareView from './squareView';
 
 export default class Square {
-    get view() {
-        return <SquareView/>;
+
+    squareClick() {
+        this.onClick();
+        alert('Now we have play = ' + this.play);
     }
 
-    squareView(props) {
-        return (
-        <button className="square" onClick={props.onClick}>
-          {props.value}
-        </button>
-        );
+    view(props) {  //This is called once and only once to create the view.
+        alert("Creating the square." + props.value + props.play);
+        this.play = props.play;
+        this.onClick = props.onClick;
+        this.value = props.value;
+        return <SquareView
+            onClick={()=>this.squareClick()}
+            value={props.value}
+            play={props.play}
+        />;
     }
 }

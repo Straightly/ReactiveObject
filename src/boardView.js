@@ -17,21 +17,25 @@ import Square from './objectSqure';
     }
   
     handleClick(i) {
+      alert("Handle the click in board?")
       const squares = this.state.squares.slice();
-      squares[i] = this.state.xIsNext ? 'X' : 'O';
+      let play = this.state.xIsNext ? 'X' : 'O';
+      squares[i] = play;
       this.setState({
         squares: squares,
         xIsNext: !this.state.xIsNext,
       });
+      this.state.squareViews.forEach(squareView => squareView.play = play);
     }
   
     renderSquare(i) {
       let theSquare = this.state.squareViews[i];
       return (
-        theSquare.squareView(
+        theSquare.view(
           {
               value: this.state.squares[i],
-              onClick: () => this.handleClick(i)
+              onClick: () => this.handleClick(i),
+              play: this.state.xIsNext ? 'X' : 'O',
           }
         )
       );
