@@ -3,7 +3,6 @@ import './index.css';
 import SquareView from './squareView';
 
 export default class Square {
-
     squareClick() {
         this.onClick();
         alert('Now we have play = ' + this.play);
@@ -13,7 +12,6 @@ export default class Square {
         alert("Creating the square." + props.value + props.play);
         this.play = props.play;
         this.onClick = props.onClick;
-        this.value = props.value;
         return <SquareView
             onClick={()=>this.squareClick()}
             value={props.value}

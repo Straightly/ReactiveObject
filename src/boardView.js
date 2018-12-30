@@ -5,7 +5,6 @@ import Square from './objectSqure';
     constructor(props) {
       super(props);
       this.state = {
-        squares: Array(9).fill(null),
         xIsNext: true,
         squareViews: Array(9).fill(null),
       };
@@ -16,17 +15,14 @@ import Square from './objectSqure';
     }
   
     handleClick(i) {
-      alert("Handle the click in board.?")
-      const squares = this.state.squares.slice();
+      alert("Handle the click in board.?") 
       let play = this.state.xIsNext ? 'X' : 'O';
-      squares[i] = play;
       const squareViews = this.state.squareViews.slice();
       alert('What is ' + squareViews);
       for(let i=0; i<0; i++) {
           squareViews[i].play= play;
       }
       this.setState({
-        squares: squares,
         xIsNext: !this.state.xIsNext,
         squareViews: squareViews,
       });
@@ -39,7 +35,6 @@ import Square from './objectSqure';
       return (
         theSquare.view(
           {
-              value: this.state.squares[i],
               onClick: () => this.handleClick(i),
               play: this.state.xIsNext ? 'X' : 'O',
           }
