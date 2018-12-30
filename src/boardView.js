@@ -26,14 +26,14 @@ import Square from './objectSqure';
     }
   
     renderSquare(i) {
-      let  theValue=this.state.squares[i];
-      let theClick= () => this.handleClick(i);
-      let theSquare = this.state.squareViews[i];
-      theSquare.value = theValue;
-      theSquare.onclick = theClick;
-      let squareView = theSquare.view;
+      let theSquare = new Square();
       return (
-        squareView
+        theSquare.squareView(
+          {
+              value: this.state.squares[i],
+              onClick: () => this.handleClick(i)
+          }
+        )
       );
     }
   
