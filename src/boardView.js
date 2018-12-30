@@ -7,29 +7,34 @@ import Square from './objectSqure';
       this.state = {
         squares: Array(9).fill(null),
         xIsNext: true,
+        squareViews: Array(9).fill(null),
       };
-      let i;
-      let squareViews = Array(9);
-      for ( i=0; i<9; i++) {
-          squareViews[i] = new Square();
-      };
-      this.state.squareViews = squareViews;
+       const squareViews = this.state.squareViews;
+       for (let i=0; i<9; i++) {
+           squareViews[i] = new Square();
+       };
     }
   
     handleClick(i) {
-      alert("Handle the click in board?")
+      alert("Handle the click in board.?")
       const squares = this.state.squares.slice();
       let play = this.state.xIsNext ? 'X' : 'O';
       squares[i] = play;
+      const squareViews = this.state.squareViews.slice();
+      alert('What is ' + squareViews);
+      for(let i=0; i<0; i++) {
+          squareViews[i].play= play;
+      }
       this.setState({
         squares: squares,
         xIsNext: !this.state.xIsNext,
+        squareViews: squareViews,
       });
-      this.state.squareViews.forEach(squareView => squareView.play = play);
+      
     }
   
     renderSquare(i) {
-      let theSquare = this.state.squareViews[i];
+      const theSquare = new Square();
       return (
         theSquare.view(
           {
