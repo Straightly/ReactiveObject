@@ -8,10 +8,12 @@ import Square from './objectSqure';
         xIsNext: true,
         squareViews: Array(9).fill(null),
       };
-       const squareViews = this.state.squareViews;
-       for (let i=0; i<9; i++) {
-           squareViews[i] = new Square();
-       };
+      let thePlay = this.state.xIsNext ? 'X' : 'O';
+      const squareViews = this.state.squareViews;
+      for (let i=0; i<9; i++) {
+        squareViews[i] = new Square();
+        squareViews[i].play = thePlay;
+      };
     }
   
     handleClick(i) {
