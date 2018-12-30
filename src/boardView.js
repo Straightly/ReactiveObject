@@ -22,7 +22,7 @@ import Square from './objectSqure';
       let play = this.state.xIsNext ? 'X' : 'O';
       const squareViews = this.state.squareViews.slice();
       alert('What is ' + squareViews);
-      for(let i=0; i<0; i++) {
+      for(let i=0; i<9; i++) {
           squareViews[i].play= play;
       }
       this.setState({
