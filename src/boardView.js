@@ -34,7 +34,8 @@ import Square from './objectSqure';
     }
   
     renderSquare(i) {
-      const theSquare = new Square();
+      const squareViews = this.state.squareViews.slice();
+      const theSquare = squareViews[i];
       return (
         theSquare.view(
           {
