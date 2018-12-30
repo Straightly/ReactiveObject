@@ -37,6 +37,7 @@ import Square from './objectSqure';
           {
               onClick: () => this.handleClick(i),
               play: this.state.xIsNext ? 'X' : 'O',
+              theIndex: i,
           }
         )
       );
