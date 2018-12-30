@@ -26,7 +26,7 @@ import Square from './objectSqure';
     }
   
     renderSquare(i) {
-      let theSquare = new Square();
+      let theSquare = this.state.squareViews[i];
       return (
         theSquare.squareView(
           {
