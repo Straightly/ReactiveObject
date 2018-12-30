@@ -3,11 +3,9 @@ import './index.css';
 import SquareView from './squareView';
 
 export default class Square {
-
     squareClick() {
         alert('Now we have play on the square = ' + this.play);
         this.onClick();
-        
     }
 
     view(props) {  //This is called many times create the view.

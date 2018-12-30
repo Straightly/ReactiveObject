@@ -13,6 +13,7 @@ import Square from './objectSqure';
       for (let i=0; i<9; i++) {
         squareViews[i] = new Square();
         squareViews[i].play = thePlay;
+        squareViews[i].theIndex = i;
       };
     }
   
