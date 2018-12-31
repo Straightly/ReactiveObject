@@ -4,35 +4,35 @@ import Square from './objectSqure';
   export default class BoardView extends React.Component {
     constructor(props) {
       super(props);
-      this.state = {
-        xIsNext: true,
-        squareViews: Array(9).fill(null),
-      };
-      let thePlay = this.state.xIsNext ? 'X' : 'O';
-      const squareViews = this.state.squareViews;
+      let nextPlay = 'X';
+      const squareViews = Array(9);
       for (let i=0; i<9; i++) {
         squareViews[i] = new Square();
-        squareViews[i].play = thePlay;
+        squareViews[i].play = nextPlay;
         squareViews[i].theIndex = i;
+      };
+      this.state = {
+        xIsNext: true,
+        squareViews: squareViews,
       };
     }
   
     handleClick(i) {
-      alert("Handle the click in board.?") 
-      let play = this.state.xIsNext ? 'X' : 'O';
+      alert("Handle the click in board.") 
+      let nextStatus  = !this.state.xIsNext;
+      let nextPlay = nextStatus ? 'X' : 'O';
       const squareViews = this.state.squareViews.slice();
-      alert('What is ' + squareViews);
       for(let i=0; i<9; i++) {
-          squareViews[i].play= play;
+          squareViews[i].play= nextPlay;
       }
+      //This trigger the rendering of the whole board.
       this.setState({
-        xIsNext: !this.state.xIsNext,
+        xIsNext: nextStatus,
         squareViews: squareViews,
       });
-      
     }
   
-    renderSquare(i) {
+    renderSquare(i, theBoard) {
       const squareViews = this.state.squareViews.slice();
       const theSquare = squareViews[i];
       return (
@@ -48,24 +48,23 @@ import Square from './objectSqure';
   
     render() {
       const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-  
       return (
         <div>
           <div className="status">{status}</div>
           <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
+            {this.renderSquare(0, this)}
+            {this.renderSquare(1, this)}
+            {this.renderSquare(2, this)}
           </div>
           <div className="board-row">
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
+            {this.renderSquare(3, this)}
+            {this.renderSquare(4, this)}
+            {this.renderSquare(5, this)}
           </div>
           <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
+            {this.renderSquare(6, this)}
+            {this.renderSquare(7, this)}
+            {this.renderSquare(8, this)}
           </div>
         </div>
       );
