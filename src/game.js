@@ -1,5 +1,4 @@
-import React, { useState }  from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 import './index.css';
 
 function Square(props) {
@@ -66,19 +65,17 @@ function Square(props) {
         return;
       }
       squares[i] = this.state.xIsNext ? "X" : "O";
-      const newState = {
+      this.setState({
         history: history.concat([
           {
             squares: squares
           }
         ]),
         stepNumber: history.length,
-        xIsNext: !this.state.xIsNext,
-        playCallBack:this.state.playCallBack,
-      };
-      this.setState(newState);
+        xIsNext: !this.state.xIsNext
+      });
       if(this.state.playCallBack) {
-        this.state.playCallBack(i, this, newState);
+        this.state.playCallBack(i);
       }
     }
   
@@ -148,61 +145,3 @@ function Square(props) {
     }
     return null;
   }
-
-
-
-function play1to2(i, domNode, componentState) {
-    alert("Reached here.");
-    var node1 = ReactDOM.findDOMNode(domNode);   
-    alert("Found game  1" + node1);
-    var state1 = componentState;
-    alert("Game1 state is", state1);
-    var stepNumber = state1.stepNumber;
-    alert("StepNumber of game 1 is " + stepNumber);
-    //var node2 = ReactDOM.findDOMNode(domNode);
-    //node2.setState(state);
-}
-
-function play2to1(i, domNode) {
-    alert("Reached here.");
-    var node1 = ReactDOM.findDOMNode(domNode);
-    alert("Found game  2" + node1);
-}
-
-var game1 = <Game playCallBack = {play2to1}/>;
-
-var game2 = <Game playCallBack = {play1to2}/>;
-
-function Incrementer() {
-    // Declare a new state variable, which we'll call "count"
-    const [count, setCount] = useState(0);
-  
-    return (
-      <div>
-        <p>You clicked {count} times</p>
-        <button onClick={() => setCount(count + 1)}>
-          Click me
-        </button>
-      </div>
-    );
-  }
-
-function renderCallBack() {
-    alert("Finished Rendering");
-}
-
-ReactDOM.render(
-    <div>
-        <h1>this is the clicker.</h1>
-       <Incrementer/>
-       <h1>this is before the first game.</h1>
-       {game1}
-       <h1>this is between the games.</h1>
-       {game2}
-       <h1>this is after the second game.</h1>
-    </div>,
-    document.getElementById("root"),
-    renderCallBack
-);
-//game1.prototype.handleClick(1);
-//game2.handleClick(2);
