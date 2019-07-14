@@ -1,6 +1,7 @@
 import React, { useState }  from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import { createStore } from 'redux';
 
 function Square(props) {
     return (
@@ -191,6 +192,28 @@ function renderCallBack() {
     alert("Finished Rendering");
 }
 
+const Green = (props) => (
+    <div className="green">{props.number}</div>
+  )
+  const Blue = (props) => (
+    <div className="blue">
+      <Green number={props.number} />
+    </div>
+  )
+   
+  class Red extends React.Component  {
+    state = {
+      number : 10
+    }
+    render() {
+      return  <div className="red">
+        {this.state.number}
+        <Blue number={this.state.number} />
+      </div>
+    }
+  }
+  
+
 ReactDOM.render(
     <div>
         <h1>this is the clicker.</h1>
@@ -200,6 +223,7 @@ ReactDOM.render(
        <h1>this is between the games.</h1>
        {game2}
        <h1>this is after the second game.</h1>
+       <Red/>
     </div>,
     document.getElementById("root"),
     renderCallBack
