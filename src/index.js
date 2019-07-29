@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
+
+function uniqueId() {
+  return '_' + Math.random().toString(36).trim();
+};
+
 function Example(props) {
   // Declare a new state variable, which we'll call "count"
   const [count, setCount] = useState([props.idValue, 0, props.callback]);
