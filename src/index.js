@@ -1,232 +1,96 @@
-import React, { useState }  from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import { createStore } from 'redux';
 
-function Square(props) {
-    return (
-      <button className="square" onClick={props.onClick}>
-        {props.value}
+function Example(props) {
+  // Declare a new state variable, which we'll call "count"
+  const [count, setCount] = useState([props.idValue, 0, props.callback]);
+
+  return (
+    <div>
+      <p>You clicked {count[1]} times</p>
+      <button onClick={() => {
+          const idValue = count[0];
+          const newValue = count[1] + 1;
+          const theCallback = count[2];
+          setCount([idValue, newValue, theCallback]);
+          if(props.callback) {
+            props.callback([idValue, newValue]);
+          } else {
+            alert("What the hack props.callback?");
+            if (theCallback) {
+              alert("Call the saved callback function.  What happen to props?");
+              theCallback(idValue, newValue);
+            }
+          }
+        }}
+      >
+        Click me
       </button>
-    );
+    </div>
+  );
+}
+
+class Game extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = [1, 1];
   }
-  
-  class Board extends React.Component {
-    renderSquare(i) {
-      return (
-        <Square
-          value={this.props.squares[i]}
-          onClick={() => this.props.onClick(i)}
-        />
-      );
+
+  updateGlobalState(counterState) {
+    debugger;
+    if (!this) {
+      alert("What the hack this");
     }
-  
-    render() {
-      return (
-        <div>
-          <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-          </div>
-        </div>
-      );
+    if (!this.state) {
+      alert("What the hack state");
     }
-  }
-  
-  export default class Game extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        history: [
-          {
-            squares: Array(9).fill(null)
-          }
-        ],
-        stepNumber: 0,
-        xIsNext: true,
-        playCallBack: props.playCallBack,
-      };
+
+    if (!this.state[0] && this.state[0] !== 0) {
+      alert("Why I lost first element?");
+    } 
+
+    if (!this.state[1] && this.state[1] !== 0) {
+      alert("Why I lost second element?");
     }
-  
-    handleClick(i) {
-      const history = this.state.history.slice(0, this.state.stepNumber + 1);
-      const current = history[history.length - 1];
-      const squares = current.squares.slice();
-      if (calculateWinner(squares) || squares[i]) {
-        return;
-      }
-      squares[i] = this.state.xIsNext ? "X" : "O";
-      const newState = {
-        history: history.concat([
-          {
-            squares: squares
-          }
-        ]),
-        stepNumber: history.length,
-        xIsNext: !this.state.xIsNext,
-        playCallBack:this.state.playCallBack,
-      };
-      this.setState(newState);
-      if(this.state.playCallBack) {
-        this.state.playCallBack(i, this, newState);
-      }
+    
+    var firstValue = this.state[0];
+    if (counterState[0] === 0) {
+      firstValue = counterState[1];
     }
-  
-    jumpTo(step) {
-      this.setState({
-        stepNumber: step,
-        xIsNext: (step % 2) === 0
-      });
+
+    var secondValue = this.state[1];
+    if (counterState[0] === 1) {
+      secondValue = counterState[1];
     }
-  
-    render() {
-      const history = this.state.history;
-      const current = history[this.state.stepNumber];
-      const winner = calculateWinner(current.squares);
-  
-      const moves = history.map((step, move) => {
-        const desc = move ?
-          'Go to move #' + move :
-          'Go to game start';
-        return (
-          <li key={move}>
-            <button onClick={() => this.jumpTo(move)}>{desc}</button>
-          </li>
-        );
-      });
-  
-      let status;
-      if (winner) {
-        status = "Winner: " + winner;
-      } else {
-        status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-      }
-  
-      return (
-        <div className="game">
-          <div className="game-board">
-            <Board
-              squares={current.squares}
-              onClick={i => this.handleClick(i)}
-            />
-          </div>
-          <div className="game-info">
-            <div>{status}</div>
-            <ol>{moves}</ol>
-          </div>
-        </div>
-      );
-    }
-  }
-  
-  function calculateWinner(squares) {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6]
+    const newState = [
+      firstValue,
+      secondValue,
     ];
-    for (let i = 0; i < lines.length; i++) {
-      const [a, b, c] = lines[i];
-      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
-      }
-    }
-    return null;
+    this.setState(newState);
   }
 
-
-
-function play1to2(i, domNode, componentState) {
-    alert("Reached here.");
-    var node1 = ReactDOM.findDOMNode(domNode);   
-    alert("Found game  1" + node1);
-    var state1 = componentState;
-    alert("Game1 state is", state1);
-    var stepNumber = state1.stepNumber;
-    alert("StepNumber of game 1 is " + stepNumber);
-    //var node2 = ReactDOM.findDOMNode(domNode);
-    //node2.setState(state);
-}
-
-function play2to1(i, domNode) {
-    alert("Reached here.");
-    var node1 = ReactDOM.findDOMNode(domNode);
-    alert("Found game  2" + node1);
-}
-
-var game1 = <Game playCallBack = {play2to1}/>;
-
-var game2 = <Game playCallBack = {play1to2}/>;
-
-function Incrementer() {
-    // Declare a new state variable, which we'll call "count"
-    const [count, setCount] = useState(0);
-  
+  render() {
+    alert("Render global");
+    const e1 = <Example idValue={0} callback={(counterState) => this.updateGlobalState(counterState)}/>;
+    const e2 = <Example idValue={1} callback={(counterState) => this.updateGlobalState(counterState)}/>;
     return (
       <div>
-        <p>You clicked {count} times</p>
-        <button onClick={() => setCount(count + 1)}>
-          Click me
-        </button>
+        {e1}
+        {e2}
+        <p/>
+        <p>Total is {this.state[0]} + {this.state[1]}</p>
       </div>
-    );
-  }
-
-function renderCallBack() {
-    alert("Finished Rendering");
+    )
+  };
 }
 
-const Green = (props) => (
-    <div className="green">{props.number}</div>
-  )
-  const Blue = (props) => (
-    <div className="blue">
-      <Green number={props.number} />
-    </div>
-  )
-   
-  class Red extends React.Component  {
-    state = {
-      number : 10
-    }
-    render() {
-      return  <div className="red">
-        {this.state.number}
-        <Blue number={this.state.number} />
-      </div>
-    }
-  }
-  
+
+
 
 ReactDOM.render(
-    <div>
-        <h1>this is the clicker.</h1>
-       <Incrementer/>
-       <h1>this is before the first game.</h1>
-       {game1}
-       <h1>this is between the games.</h1>
-       {game2}
-       <h1>this is after the second game.</h1>
-       <Red/>
-    </div>,
-    document.getElementById("root"),
-    renderCallBack
+  <Game/>,
+  document.getElementById("root"),
+  null
 );
 //game1.prototype.handleClick(1);
 //game2.handleClick(2);
