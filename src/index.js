@@ -89,7 +89,7 @@ function GiverFunction(props) {
   // Declare a new state variable, which we'll call "count"
   const [count, setCount] = useState(0);
   const previousCount = usePrevious(count);
-  
+
   useEffect(() => {
     const currentState = {count: count};
     const previousState = {count: previousCount};
@@ -107,7 +107,6 @@ function GiverFunction(props) {
     </div>
   );
 }
-
 
 class Taker extends React.Component {
   constructor(props) {
@@ -143,6 +142,30 @@ class Taker extends React.Component {
       </div>
     );
   }
+}
+
+
+function TakerFunction(props) {
+  // Declare a new state variable, which we'll call "count"
+  const [count, setCount] = useState(props.startValue===undefined ? 0 : props.startValue);
+  const previousCount = usePrevious(count);
+
+  useEffect(() => {
+    const currentState = {count: count};
+    const previousState = {count: previousCount};
+    if (props.callback) {
+      props.callback(props.id, currentState, previousState);
+    }
+  });
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
 }
 
 class DepdendentUser extends React.Component {
@@ -198,7 +221,7 @@ class DepdendentUser extends React.Component {
       return (
         <div>
           <GiverFunction        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[0]}/>
-          <Taker        id={this.state.ids[1]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[1]}/>
+          <TakerFunction        id={this.state.ids[1]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[1]}/>
           <IncrementalCounterClass/>
           <IncrementalCounterFunction/>
           <p/>
@@ -213,6 +236,3 @@ ReactDOM.render(
   document.getElementById("root"),
   null
 );
-
-//game1.prototype.handleClick(1);
-//game2.handleClick(2);
