@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 
@@ -6,96 +6,120 @@ function uniqueId() {
   return '_' + Math.random().toString(36).trim();
 };
 
-function Example(props) {
+function IncrementCounter(props) {
   // Declare a new state variable, which we'll call "count"
-  const [count, setCount] = useState([props.idValue, 0, props.callback]);
+  let startValue = props.persistentedState;
+  if (startValue === undefined) {
+    startValue = 0;
+  }
+  const [count, setCount] = useState(startValue);
+
+  useEffect(() => {
+    // Update the document title using the browser API
+    props.callback(props.id, count);
+    document.title = `You clicked ${count} times` + props.callback;
+  }, [count]);
 
   return (
     <div>
-      <p>You clicked {count[1]} times</p>
-      <button onClick={() => {
-          const idValue = count[0];
-          const newValue = count[1] + 1;
-          const theCallback = count[2];
-          setCount([idValue, newValue, theCallback]);
-          if(props.callback) {
-            props.callback([idValue, newValue]);
-          } else {
-            alert("What the hack props.callback?");
-            if (theCallback) {
-              alert("Call the saved callback function.  What happen to props?");
-              theCallback(idValue, newValue);
-            }
-          }
-        }}
-      >
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>
         Click me
       </button>
     </div>
   );
 }
 
-class Game extends React.Component {
+class InCounter extends React.Component {
   constructor(props) {
     super(props);
-    this.state = [1, 1];
+    let startValue = props.persistentedState;
+    if (startValue === undefined) {
+      startValue = 0;
+    }
+    this.state = {
+      count: startValue
+    };
   }
 
-  updateGlobalState(counterState) {
-    debugger;
-    if (!this) {
-      alert("What the hack this");
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.count !== this.state.count) {
+      this.props.callback(this.props.id, this.state.count - prevState.count);
     }
-    if (!this.state) {
-      alert("What the hack state");
-    }
+  }
 
-    if (!this.state[0] && this.state[0] !== 0) {
-      alert("Why I lost first element?");
-    } 
-
-    if (!this.state[1] && this.state[1] !== 0) {
-      alert("Why I lost second element?");
+  componentDidMount() {
+    if (this.props.callback) {
+      this.props.callback(this.props.id, 0);
     }
-    
-    var firstValue = this.state[0];
-    if (counterState[0] === 0) {
-      firstValue = counterState[1];
-    }
-
-    var secondValue = this.state[1];
-    if (counterState[0] === 1) {
-      secondValue = counterState[1];
-    }
-    const newState = [
-      firstValue,
-      secondValue,
-    ];
-    this.setState(newState);
   }
 
   render() {
-    alert("Render global");
-    const e1 = <Example idValue={0} callback={(counterState) => this.updateGlobalState(counterState)}/>;
-    const e2 = <Example idValue={1} callback={(counterState) => this.updateGlobalState(counterState)}/>;
     return (
       <div>
-        {e1}
-        {e2}
-        <p/>
-        <p>Total is {this.state[0]} + {this.state[1]}</p>
+        <p>You clicked {this.state.count} times</p>
+        <button onClick={() => this.setState({ count: this.state.count + 1 })}>
+          Click me
+        </button>
       </div>
-    )
-  };
+    );
+  }
 }
 
+class Combiner extends React.Component {
+  constructor(props) {
+    super(props);
+    let id1 = uniqueId();
+    let id2 = uniqueId();
+    let id3 = uniqueId();
+    let id4 = uniqueId();
+    this.state = {state1: -1, state2: -1, ids: [id1, id2, id3, id4]};
+  }
 
+  updateGlobalState(id, childState) {
+    if (id === this.state.ids[0] && this.state.state1 !== childState) {
+      let state2Value = this.state.state2 + childState - this.state.state1;
+      let newStateChange = {state1: childState};
+      if (state2Value !== this.state.state2) {
+        newStateChange.state2 = state2Value;
+      }
+      this.setState(newStateChange);
+    }
+    if (id === this.state.ids[1] && childState > 0) {
+      this.setState({state2: this.state.state2 + childState});
+    }
+  }
 
+  render() {
+    if (this.state.state1 % 2 === 0) {
+      return (
+        <div>
+          <IncrementCounter id={this.state.ids[0]} callback={(id, count) => this.updateGlobalState(id, count) }/>
+          <InCounter        id={this.state.ids[1]} callback={(id, count) => this.updateGlobalState(id, count)}/>
+          <p/>
+          <p>Total is {this.state.state1} + {this.state.state2}</p>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <div/> 
+           <IncrementCounter id={this.state.ids[0]} callback={(id, count) => this.updateGlobalState(id, count) }/>
+           <InCounter        id={this.state.ids[1]} callback={(id, count) => this.updateGlobalState(id, count)}/>
+
+          <p/>
+          <p>Total is {this.state.state1} + {this.state.state2}</p>
+        </div>
+      );
+    }
+  }
+}//class
 
 ReactDOM.render(
-  <Game/>,
+  <Combiner/>,
   document.getElementById("root"),
   null
 );
+
 //game1.prototype.handleClick(1);
 //game2.handleClick(2);
