@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
 
@@ -40,8 +40,7 @@ function IncrementalCounterFunction() {
   );
 }
 
-
-class Giver extends React.Component {
+class GiverClass extends React.Component {
   constructor(props) {
     super(props);
     let startValue = props.persistentedState;
@@ -75,6 +74,38 @@ class Giver extends React.Component {
       </div>
     );
   }
+}
+
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+
+function GiverFunction(props) {
+  // Declare a new state variable, which we'll call "count"
+  const [count, setCount] = useState(0);
+  const previousCount = usePrevious(count);
+  
+  useEffect(() => {
+    const currentState = {count: count};
+    const previousState = {count: previousCount};
+    if (props.callback) {
+      props.callback(props.id, currentState, previousState);
+    }
+  });
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
 }
 
 
@@ -166,7 +197,7 @@ class DepdendentUser extends React.Component {
      
       return (
         <div>
-          <Giver        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[0]}/>
+          <GiverFunction        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[0]}/>
           <Taker        id={this.state.ids[1]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[1]}/>
           <IncrementalCounterClass/>
           <IncrementalCounterFunction/>
