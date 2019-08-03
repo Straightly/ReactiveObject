@@ -6,6 +6,41 @@ function uniqueId() {
   return '_' + Math.random().toString(36).trim();
 };
 
+class IncrementalCounterClass extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0
+    };
+  }
+
+  render() {
+    return (
+      <div>
+        <p>You clicked {this.state.count} times</p>
+        <button onClick={() => this.setState({ count: this.state.count + 1 })}>
+          Click me
+        </button>
+      </div>
+    );
+  }
+}
+
+function IncrementalCounterFunction() {
+  // Declare a new state variable, which we'll call "count"
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+
+
 class Giver extends React.Component {
   constructor(props) {
     super(props);
@@ -55,6 +90,18 @@ class Taker extends React.Component {
     };
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState !== this.state) {
+      this.props.callback(this.props.id, this.state, prevState);
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.callback) {
+      this.props.callback(this.props.id, this.state);
+    }
+  }
+
   render() {
     return (
       <div>
@@ -78,11 +125,14 @@ class DepdendentUser extends React.Component {
     let reducers = {};
     reducers[id1, id2] = f1;
     this.state = {
-      state1: 0, 
-      state2: 0, 
+      childStates: [0, 0], 
       ids: [id1, id2, id3, id4],
       reducers:reducers
     };
+  }
+
+  reducer1To2() {
+    return 
   }
 
   updateGlobalState(id, currentChildState, prevChildSate) {
@@ -94,17 +144,21 @@ class DepdendentUser extends React.Component {
       prevChildSate.count !== undefined) {
       childState = currentChildState.count - prevChildSate.count;
     };
-    if (id == this.state.ids[0] && childState > 0) {
+    if (id === this.state.ids[0] && childState > 0) {
       let newIds = this.state.ids.slice();
       newIds[1] = uniqueId();
+      let childStates = this.state.childStates.slice();
+      childStates[0] = this.state.childStates[0] + childState;
+      childStates[1] = this.state.childStates[1] + childState;
       this.setState({
-        state1: this.state.state1 + childState, 
-        state2: this.state.state2 + childState,
+        childStates: childStates,
         ids: newIds  //forcing recreation?
       });
     }
-    if (id == this.state.ids[1] && childState > 0) {
-      this.setState({state2: this.state.state2 + childState});
+    if (id === this.state.ids[1] && childState > 0) {
+      let newStates = this.state.childStates.slice();
+      newStates[1] = this.state.childStates[1] + childState;
+      this.setState({childStates: newStates});
     }
   }
 
@@ -112,10 +166,12 @@ class DepdendentUser extends React.Component {
      
       return (
         <div>
-          <Giver        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.state1}/>
-          <Taker        id={this.state.ids[0]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.state2}/>
+          <Giver        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[0]}/>
+          <Taker        id={this.state.ids[1]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[1]}/>
+          <IncrementalCounterClass/>
+          <IncrementalCounterFunction/>
           <p/>
-          <p>Total is {this.state.state1} + {this.state.state2}</p>
+          <p>Total is {this.state.childStates[0]} + {this.state.childStates[1]}</p>
         </div>
       );
   }
