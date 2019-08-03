@@ -50,7 +50,7 @@ class InCounter extends React.Component {
 
   componentDidMount() {
     if (this.props.callback) {
-      this.props.callback(this.props.id, 0);
+      this.props.callback(this.props.id, this.state.count);
     }
   }
 
@@ -73,45 +73,40 @@ class Combiner extends React.Component {
     let id2 = uniqueId();
     let id3 = uniqueId();
     let id4 = uniqueId();
-    this.state = {state1: -1, state2: -1, ids: [id1, id2, id3, id4]};
+    let f1 = (id1, id2, state1, prevstate1, state2, prevProp1) => {};
+    let reducers = {};
+    reducers[id1, id2] = f1;
+    this.state = {
+      state1: -1, 
+      state2: -1, 
+      ids: [id1, id2, id3, id4],
+      reducers:reducers
+    };
+
+  
   }
 
   updateGlobalState(id, childState) {
-    if (id === this.state.ids[0] && this.state.state1 !== childState) {
-      let state2Value = this.state.state2 + childState - this.state.state1;
-      let newStateChange = {state1: childState};
-      if (state2Value !== this.state.state2) {
-        newStateChange.state2 = state2Value;
-      }
-      this.setState(newStateChange);
+    if (id == this.state.ids[0] && childState > 0) {
+      let state2Value = this.state.state2 + childState;
+      this.setState({
+        state1: this.state.state1 + childState, 
+        state2: this.state.state2 + childState});
     }
-    if (id === this.state.ids[1] && childState > 0) {
+    if (id == this.state.ids[1] && childState > 0) {
       this.setState({state2: this.state.state2 + childState});
     }
   }
 
   render() {
-    if (this.state.state1 % 2 === 0) {
       return (
         <div>
-          <IncrementCounter id={this.state.ids[0]} callback={(id, count) => this.updateGlobalState(id, count) }/>
-          <InCounter        id={this.state.ids[1]} callback={(id, count) => this.updateGlobalState(id, count)}/>
+          <InCounter        id={this.state.ids[0]} callback={(id, count) => this.updateGlobalState(id, count)} startValue={this.state.state1}/>
+          <InCounter        id={this.state.ids[1]} callback={(id, count) => this.updateGlobalState(id, count)} startValue={this.state.state2}/>
           <p/>
           <p>Total is {this.state.state1} + {this.state.state2}</p>
         </div>
       );
-    } else {
-      return (
-        <div>
-          <div/> 
-           <IncrementCounter id={this.state.ids[0]} callback={(id, count) => this.updateGlobalState(id, count) }/>
-           <InCounter        id={this.state.ids[1]} callback={(id, count) => this.updateGlobalState(id, count)}/>
-
-          <p/>
-          <p>Total is {this.state.state1} + {this.state.state2}</p>
-        </div>
-      );
-    }
   }
 }//class
 
