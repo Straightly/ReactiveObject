@@ -46,7 +46,7 @@ class Giver extends React.Component {
 class Taker extends React.Component {
   constructor(props) {
     super(props);
-    let startValue = props.persistentedState;
+    let startValue = props.startValue;
     if (startValue === undefined) {
       startValue = 0;
     }
@@ -95,9 +95,13 @@ class DepdendentUser extends React.Component {
       childState = currentChildState.count - prevChildSate.count;
     };
     if (id == this.state.ids[0] && childState > 0) {
+      let newIds = this.state.ids.slice();
+      newIds[1] = uniqueId();
       this.setState({
         state1: this.state.state1 + childState, 
-        state2: this.state.state2 + childState});
+        state2: this.state.state2 + childState,
+        ids: newIds  //forcing recreation?
+      });
     }
     if (id == this.state.ids[1] && childState > 0) {
       this.setState({state2: this.state.state2 + childState});
@@ -105,10 +109,11 @@ class DepdendentUser extends React.Component {
   }
 
   render() {
+     
       return (
         <div>
-          <Giver        id={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.state1}/>
-          <Taker        id={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.state2}/>
+          <Giver        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.state1}/>
+          <Taker        id={this.state.ids[0]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.state2}/>
           <p/>
           <p>Total is {this.state.state1} + {this.state.state2}</p>
         </div>
