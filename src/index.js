@@ -108,7 +108,7 @@ function GiverFunction(props) {
   );
 }
 
-class Taker extends React.Component {
+class TakerClass extends React.Component {
   constructor(props) {
     super(props);
     let startValue = props.startValue;
@@ -168,37 +168,30 @@ function TakerFunction(props) {
   );
 }
 
-class DepdendentUser extends React.Component {
-  constructor(props) {
-    super(props);
-    let id1 = uniqueId();
-    let id2 = uniqueId();
-    let id3 = uniqueId();
-    let id4 = uniqueId();
-    let f1 = (id1, id2, state1, prevstate1, state2, prevProp1) => {};
-    let reducers = {};
-    reducers[id1, id2] = f1;
-    this.state = {
-      childStates: [0, 0], 
-      ids: [id1, id2, id3, id4],
-      reducers:reducers
-    };
-  }
+function dependency(Giver, Taker) {
+  return class extends React.Component {
+    constructor(props) {
+      super(props);
+      let id1 = uniqueId();
+      let id2 = uniqueId();
+      let reducers = {};
+      this.state = {
+        childStates: [0, 0], 
+        ids: [id1, id2],
+        reducers:reducers
+      };
+    }
 
-  reducer1To2() {
-    return 
-  }
-
-  updateGlobalState(id, currentChildState, prevChildSate) {
-    let childState = 0;
-    if(
-      currentChildState && 
-      currentChildState.count !== undefined && 
-      prevChildSate && 
-      prevChildSate.count !== undefined) {
-      childState = currentChildState.count - prevChildSate.count;
-    };
-    if (id === this.state.ids[0] && childState > 0) {
+    updateGiver(currentChildState, prevChildSate) {
+      let childState = 0;
+      if(
+        currentChildState && 
+        currentChildState.count !== undefined && 
+        prevChildSate && 
+        prevChildSate.count !== undefined) {
+        childState = currentChildState.count - prevChildSate.count;
+      };
+      
       let newIds = this.state.ids.slice();
       newIds[1] = uniqueId();
       let childStates = this.state.childStates.slice();
@@ -209,30 +202,54 @@ class DepdendentUser extends React.Component {
         ids: newIds  //forcing recreation?
       });
     }
-    if (id === this.state.ids[1] && childState > 0) {
-      let newStates = this.state.childStates.slice();
-      newStates[1] = this.state.childStates[1] + childState;
-      this.setState({childStates: newStates});
+
+    updateGlobalState(id, currentChildState, prevChildSate) {
+      let childState = 0;
+      if(
+        currentChildState && 
+        currentChildState.count !== undefined && 
+        prevChildSate && 
+        prevChildSate.count !== undefined) {
+        childState = currentChildState.count - prevChildSate.count;
+      };
+      if (id === this.state.ids[0] && childState > 0) {
+        let newIds = this.state.ids.slice();
+        newIds[1] = uniqueId();
+        let childStates = this.state.childStates.slice();
+        childStates[0] = this.state.childStates[0] + childState;
+        childStates[1] = this.state.childStates[1] + childState;
+        this.setState({
+          childStates: childStates,
+          ids: newIds  //forcing recreation?
+        });
+      }
+      if (id === this.state.ids[1] && childState > 0) {
+        let newStates = this.state.childStates.slice();
+        newStates[1] = this.state.childStates[1] + childState;
+        this.setState({childStates: newStates});
+      }
+    }
+
+    render() {
+        return (
+          <div>
+            <Giver        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[0]}/>
+            <Taker       id={this.state.ids[1]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[1]}/>
+            <IncrementalCounterClass/>
+            <IncrementalCounterFunction/>
+            <p/>
+            <p>Total is {this.state.childStates[0]} + {this.state.childStates[1]}</p>
+          </div>
+        );
     }
   }
+}
 
-  render() {
-     
-      return (
-        <div>
-          <GiverFunction        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[0]}/>
-          <TakerFunction        id={this.state.ids[1]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[1]}/>
-          <IncrementalCounterClass/>
-          <IncrementalCounterFunction/>
-          <p/>
-          <p>Total is {this.state.childStates[0]} + {this.state.childStates[1]}</p>
-        </div>
-      );
-  }
-}//class
+const DependencyPair = dependency(GiverFunction, TakerClass);
+
 
 ReactDOM.render(
-  <DepdendentUser/>,
+  <DependencyPair/>,
   document.getElementById("root"),
   null
 );
