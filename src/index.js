@@ -43,24 +43,24 @@ function IncrementalCounterFunction() {
 class GiverClass extends React.Component {
   constructor(props) {
     super(props);
-    let startValue = props.persistentedState;
-    if (startValue === undefined) {
-      startValue = 0;
+    let contextValue = props.persistentedState;
+    if (contextValue === undefined) {
+      contextValue = 0;
     }
     this.state = {
-      count: startValue
+      count: contextValue
     };
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState !== this.state) {
-      this.props.callback(this.props.id, this.state, prevState);
+      this.props.depdencyCallback(this.props.id, this.state, prevState);
     }
   }
 
   componentDidMount() {
-    if (this.props.callback) {
-      this.props.callback(this.props.id, this.state);
+    if (this.props.depdencyCallback) {
+      this.props.depdencyCallback(this.props.id, this.state);
     }
   }
 
@@ -84,7 +84,6 @@ function usePrevious(value) {
   return ref.current;
 }
 
-
 function GiverFunction(props) {
   // Declare a new state variable, which we'll call "count"
   const [count, setCount] = useState(0);
@@ -93,8 +92,8 @@ function GiverFunction(props) {
   useEffect(() => {
     const currentState = {count: count};
     const previousState = {count: previousCount};
-    if (props.callback) {
-      props.callback(props.id, currentState, previousState);
+    if (props.depdencyCallback) {
+      props.depdencyCallback(props.id, currentState, previousState);
     }
   });
 
@@ -111,24 +110,24 @@ function GiverFunction(props) {
 class TakerClass extends React.Component {
   constructor(props) {
     super(props);
-    let startValue = props.startValue;
-    if (startValue === undefined) {
-      startValue = 0;
+    let contextValue = props.contextValue;
+    if (contextValue === undefined) {
+      contextValue = 0;
     }
     this.state = {
-      count: startValue
+      count: contextValue
     };
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState !== this.state) {
-      this.props.callback(this.props.id, this.state, prevState);
+      this.props.depdencyCallback(this.props.id, this.state, prevState);
     }
   }
 
   componentDidMount() {
-    if (this.props.callback) {
-      this.props.callback(this.props.id, this.state);
+    if (this.props.depdencyCallback) {
+      this.props.depdencyCallback(this.props.id, this.state);
     }
   }
 
@@ -147,14 +146,17 @@ class TakerClass extends React.Component {
 
 function TakerFunction(props) {
   // Declare a new state variable, which we'll call "count"
-  const [count, setCount] = useState(props.startValue===undefined ? 0 : props.startValue);
+  const [count, setCount] = useState(props.contextValue===undefined ? 0 : props.contextValue);
   const previousCount = usePrevious(count);
 
+  if (props.contextValue !== undefined && props.contextValue > count) {
+    setCount(props.contextValue);
+  }  
   useEffect(() => {
     const currentState = {count: count};
     const previousState = {count: previousCount};
-    if (props.callback) {
-      props.callback(props.id, currentState, previousState);
+    if (props.depdencyCallback) {
+      props.depdencyCallback(props.id, currentState, previousState);
     }
   });
 
@@ -233,10 +235,8 @@ function dependency(Giver, Taker) {
     render() {
         return (
           <div>
-            <Giver        id={this.state.ids[0]} key={this.state.ids[0]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[0]}/>
-            <Taker       id={this.state.ids[1]} key={this.state.ids[1]} callback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} startValue={this.state.childStates[1]}/>
-            <IncrementalCounterClass/>
-            <IncrementalCounterFunction/>
+            <Giver        id={this.state.ids[0]} key={this.state.ids[0]} depdencyCallback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} contextValue={this.state.childStates[0]}/>
+            <Taker       id={this.state.ids[1]} key={this.state.ids[1]} depdencyCallback={(id, prevState, curState) => this.updateGlobalState(id, prevState, curState)} contextValue={this.state.childStates[1]}/>
             <p/>
             <p>Total is {this.state.childStates[0]} + {this.state.childStates[1]}</p>
           </div>
@@ -245,7 +245,7 @@ function dependency(Giver, Taker) {
   }
 }
 
-const DependencyPair = dependency(GiverFunction, TakerClass);
+const DependencyPair = dependency(GiverFunction, TakerFunction);
 
 
 ReactDOM.render(
